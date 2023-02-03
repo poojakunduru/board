@@ -10,6 +10,14 @@ class Board extends React.Component {
 
     ctx;
     isDrawing = false;
+    state = {
+        tool: 'pen',
+      };
+    
+      setTool = (tool) => {
+        this.setState({ tool });
+      };
+    
 
     constructor(props) {
         super(props);
@@ -81,27 +89,46 @@ class Board extends React.Component {
         }, false);
 
         var root = this;
-        var onPaint = function() {
-            ctx.beginPath();
-            ctx.moveTo(last_mouse.x, last_mouse.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.closePath();
-            ctx.stroke();
+var onPaint = function() {
+  ctx.beginPath();
+  ctx.moveTo(last_mouse.x, last_mouse.y);
+  ctx.lineTo(mouse.x, mouse.y);
+  ctx.closePath();
 
-            if(root.timeout != undefined) clearTimeout(root.timeout);
-            root.timeout = setTimeout(function(){
-                var base64ImageData = canvas.toDataURL("image/png");
-                root.socket.emit("canvas-data", base64ImageData);
-            }, 1000)
-        };
+  if (root.state.tool === 'pen') {
+    ctx.strokeStyle = root.props.color;
+    ctx.lineWidth = root.props.size;
+    ctx.stroke();
+  } else if (root.state.tool === 'eraser') {
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 30;
+    ctx.stroke();
+  }
+
+  if (root.timeout !== undefined) clearTimeout(root.timeout);
+  root.timeout = setTimeout(function() {
+    var base64ImageData = canvas.toDataURL("image/png");
+    root.socket.emit("canvas-data", base64ImageData);
+  }, 1000);
+};
+
+        
     }
 
     render() {
-        return (
-            <div class="sketch" id="sketch">
-                <canvas className="board" id="board"></canvas>
-            </div>
-        )
+        const { color, size } = this.props;
+    const { tool } = this.state;
+    return (
+        <div class="sketch" id="sketch">
+          <canvas className="board" id="board"></canvas>
+          <div className="toolbar">
+            <button onClick={() => this.setTool('pen')}>Pen</button>
+            <button onClick={() => this.setTool('eraser')}>Eraser</button>
+          </div>
+        </div>
+      );
+
+        
     }
 }
 

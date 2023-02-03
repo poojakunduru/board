@@ -3,14 +3,14 @@ import Board from '../board/Board';
 
 import './style.css';
 
-class Container extends React.Component
-{
+class Container extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             color: "#000000",
-            size: "5"
+            size: "5",
+            isEraser: false
         }
     }
 
@@ -26,8 +26,14 @@ class Container extends React.Component
         })
     }
 
-    render() {
+    toggleEraser() {
+        this.setState({
+            isEraser: !this.state.isEraser,
+            color: this.state.isEraser ? "#000000" : "#FFFFFF"
+        })
+    }
 
+    render() {
         return (
             <div className="container">
                 <div class="tools-section">
@@ -46,6 +52,12 @@ class Container extends React.Component
                             <option> 25 </option>
                             <option> 30 </option>
                         </select>
+                    </div>
+
+                    <div className="eraser-container">
+                        <button onClick={this.toggleEraser.bind(this)}>
+                            {this.state.isEraser ? "Brush" : "Eraser"}
+                        </button>
                     </div>
 
                 </div>
